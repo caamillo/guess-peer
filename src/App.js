@@ -1,21 +1,74 @@
-import { useEffect } from 'react';
-import socketIO from 'socket.io-client';
-const socket = socketIO.connect('http://localhost:5001');
+import { useEffect, useState } from 'react';
 
 function App() {
 
-  useEffect(() => {
+    const [room, setRoom] = useState(null)
+    const [usrid, setUsrId] = useState(null)
 
-    return () => {
+    const joinRoom = () => {
+        const roomid = document.getElementById('roomidtxt').value.trim()
+        console.log('Joining ' + roomid)
+        fetch('http://localhost:5001/joinroom?' + new URLSearchParams({
+            usrid: usrid == null? '' : usrid,
+            roomid: roomid
+        }))
+        .then(res => res.json())
+        .then(data => {
+            setUsrId(data.usrid)
+            setRoom(data.room)
+        })
     }
-  }, [])
 
-  return (
-    <div>
-      <button onClick={ () => {
-      } }>Create Room</button>
-    </div>
-  );
+    const createRoom = () => {
+        fetch('http://localhost:5001/createroom')
+        .then(res => res.json())
+        .then(data => {
+            setUsrId(data.usrid)
+            setRoom(data.room)
+        })
+    }
+    useEffect(() => {
+        const t = setInterval(async () => {
+            console.log('Fetching...')
+            console.log(room)
+            fetch('http://localhost:5001/getroom?' + new URLSearchParams({
+                usrid: usrid == null? '' : usrid
+            }))
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setRoom(data.room)
+            })
+        }, 1E3)
+        return () => clearInterval(t)
+    })
+
+    useEffect(() => {
+        console.log(room)
+    }, [room])
+
+    return (
+        <div>
+            <p>userid:</p>
+            <span>{ usrid && usrid }</span>
+            <p>Actual Room:</p>
+            <span>{ room && room.roomid }</span>
+            <br></br>
+            <p>Users:</p>
+            { room && room.usrids.map(usrid => {
+                return (
+                    <div key={ usrid } >
+                        <span>{ usrid }</span>
+                        <br></br>
+                    </div>
+                )
+            }) }
+            <br></br>
+            <button onClick={ () => createRoom() }>Create Room</button>
+            <input id='roomidtxt' type='text'/>
+            <button onClick={ () => joinRoom() }>Join Room</button>
+        </div>
+    );
 }
 
 export default App
