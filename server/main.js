@@ -12,6 +12,12 @@ app.use(morgan('tiny'))
 
 const getUsrRoom = (usrid) => Object.keys(rooms).find(room => rooms[room].usrids.some(id => id === usrid))
 
+global.self = {}
+
+require('./loader')
+
+console.log(self)
+
 const leaveRoom = (roomid, usrid) => {
     const room = rooms[roomid]
     if (room == null) throw "Non esiste nessuna stanza con questo id"
@@ -43,6 +49,26 @@ const createRoom = (roomid, usrid) => {
     console.log('Created room ' + roomid)
     return rooms[roomid]
 }
+
+app.get('/sendCommand', (req, res) => {
+    let cmdRes = null
+    const cmd = self.commands[req.query.cmd]
+    try {
+        if (!cmd || !(cmd.execute)) throw "Command not found"
+        if (cmd && cmd.execute) {
+            const args = Object.keys(req.query).filter(el => el != 'cmd').map(el => req.query[el])
+            if (args.length < cmd.minArgs) throw `Error: min. args: ${ cmd.minArgs }. You inserted: ${ args.length } args`
+            if (args.length > cmd.maxArgs && cmd.maxArgs !== -1) throw `Error: max. args: ${ cmd.maxArgs }. You inserted: ${ args.length } args`
+            cmdRes = self.commands[req.query.cmd].execute(self, args)
+        }
+    } catch(err) {
+        return res.status(400).json({
+            code: 400,
+            message: err
+        })
+    }
+    return res.status(200).json(cmdRes)
+})
 
 app.get('/getroom', (req, res) => {
     console.log(rooms)

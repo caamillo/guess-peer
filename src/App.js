@@ -5,6 +5,17 @@ function App() {
     const [room, setRoom] = useState(null)
     const [usrid, setUsrId] = useState(null)
 
+    const cooldown = 1E3
+
+    const sendCommand = async (cmd, ...args) => {
+        fetch('http://localhost:5001/sendCommand?' + new URLSearchParams({
+            cmd: cmd,
+            args: [args]
+        }))
+        .then(res => res.json())
+        .then(data => console.log(data))
+    }
+
     const joinRoom = () => {
         const roomid = document.getElementById('roomidtxt').value.trim()
         console.log('Joining ' + roomid)
@@ -39,7 +50,7 @@ function App() {
                 console.log(data)
                 setRoom(data.room)
             })
-        }, 1E3)
+        }, cooldown)
         const leaveRoom = async () => {
             await fetch('http://localhost:5001/leaveroom?usrid=' + usrid)
         }
