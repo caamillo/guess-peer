@@ -40,12 +40,16 @@ function App() {
                 setRoom(data.room)
             })
         }, 1E3)
-        return () => clearInterval(t)
+        const leaveRoom = async () => {
+            await fetch('http://localhost:5001/leaveroom?usrid=' + usrid)
+        }
+        window.addEventListener('beforeunload', leaveRoom)
+        return () => {
+            window.removeEventListener('beforeunload', leaveRoom)
+            clearInterval(t)
+        }
     })
 
-    useEffect(() => {
-        console.log(room)
-    }, [room])
 
     return (
         <div>

@@ -18,8 +18,9 @@ const leaveRoom = (roomid, usrid) => {
     if (!room.usrids.some(el => el === usrid)) throw "Non sei in questa stanza"
     if (room.headusr === usrid && room.usrids.length === 1) return delete rooms[roomid]
     else if (room.headusr === usrid && room.usrids.length > 1)
-        rooms[roomid].usrids.splice(rooms[roomid].usrids.indexOf(usrid), 1)
-    rooms[roomid].headusr = rooms[roomid].usrids[Math.random() * rooms[roomid].usrids.length]
+        rooms[roomid].headusr = rooms[roomid].usrids[Math.floor(Math.random() * rooms[roomid].usrids.length)]
+    console.log(usrid + ' è uscito')
+    rooms[roomid].usrids.splice(rooms[roomid].usrids.indexOf(usrid), 1)
 }
 
 const joinRoom = (roomid, usrid) => {
@@ -43,20 +44,25 @@ const createRoom = (roomid, usrid) => {
     return rooms[roomid]
 }
 
-app.get('/getroom', (req, res) => res.json({
-    room: rooms[ getUsrRoom(req.query.usrid) ]
-}))
+app.get('/getroom', (req, res) => {
+    console.log(rooms)
+    res.status(200).json({
+        room: rooms[ getUsrRoom(req.query.usrid) ]
+    })
+})
 
 app.get('/leaveroom', (req, res) => {
+    let roomid = null
     try {
-        leaveRoom(req.query.roomid, req.query.usrid)
+        roomid = getUsrRoom(req.query.usrid)
+        leaveRoom(roomid, req.query.usrid)
     } catch(err) {
         return res.status(400).json({
             message: err
         })
     }
     return res.status(200).json({
-        roomid: req.query.roomid
+        roomid: roomid
     })
 })
 
