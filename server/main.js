@@ -60,6 +60,7 @@ app.get('/sendCommand', (req, res) => {
             if (args.length < cmd.args.min) throw `Error: min. args: ${ cmd.args.min }. You inserted: ${ args.length } args`
             if (args.length > cmd.args.max && cmd.args.max !== -1) throw `Error: max. args: ${ cmd.args.max }. You inserted: ${ args.length } args`
             cmdRes = self.commands[req.query.cmd].execute(self, args)
+            if (cmdRes.code >= 400) throw cmdRes.message
         }
     } catch(err) {
         return res.status(400).json({

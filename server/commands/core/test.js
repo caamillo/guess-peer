@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'test name',
+    name: 'test',
     desc: 'test desc',
     args: {
         min: 0,
@@ -7,6 +7,17 @@ module.exports = {
     },
     utilisation: 'test [...args]',
     execute: (self, args) => {
-        for (let arg of args) console.log(arg)
+        try {
+            for (let arg of args) console.log(arg)
+        } catch(err) {
+            return {
+                code: 400,
+                message: err
+            }
+        }
+        return {
+            code: 200,
+            message: 'Testttstsstts'
+        }
     }
 }
