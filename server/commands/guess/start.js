@@ -1,13 +1,17 @@
+const { initGame } = require('../../guess/utils')
+
 module.exports = {
-    name: 'test',
-    desc: 'test desc',
+    name: 'start',
+    desc: 'Start the game!',
     args: {
-        min: -1, max: -1
+        min: 1, max: -1
     },
     utilisation: 'test [...args]',
-    execute: (self, args) => {
+    execute: (self, roomid) => {
         try {
-            for (let arg of args) console.log(arg)
+            if (!self.rooms[roomid]) throw "Questa stanza non esiste"
+            initGame(self, roomid)
+            console.log(self.rooms[roomid])
         } catch(err) {
             return {
                 code: 400,

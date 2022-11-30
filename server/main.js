@@ -5,54 +5,54 @@ const { uuid } = require('uuidv4')
 const morgan = require('morgan')
 const PORT = 5001
 
-const rooms = {}
-
 app.use(cors())
 app.use(morgan('tiny'))
 
-const getUsrRoom = (usrid) => Object.keys(rooms).find(room => rooms[room].usrids.some(id => id === usrid))
-
 global.self = {}
 
+require('./config')
 require('./loader')
 
-console.log(self)
+self.rooms = {}
+
+const getUsrRoom = (usrid) => Object.keys(self.rooms).find(room => self.rooms[room].usrids.some(id => id === usrid))
 
 const leaveRoom = (roomid, usrid) => {
-    const room = rooms[roomid]
+    const room = self.rooms[roomid]
     if (room == null) throw "Non esiste nessuna stanza con questo id"
     if (!room.usrids.some(el => el === usrid)) throw "Non sei in questa stanza"
-    if (room.headusr === usrid && room.usrids.length === 1) return delete rooms[roomid]
+    if (room.headusr === usrid && room.usrids.length === 1) return delete self.rooms[roomid]
     else if (room.headusr === usrid && room.usrids.length > 1)
-        rooms[roomid].headusr = rooms[roomid].usrids[Math.floor(Math.random() * rooms[roomid].usrids.length)]
+        self.rooms[roomid].headusr = self.rooms[roomid].usrids[Math.floor(Math.random() * self.rooms[roomid].usrids.length)]
     console.log(usrid + ' è uscito')
-    rooms[roomid].usrids.splice(rooms[roomid].usrids.indexOf(usrid), 1)
+    self.rooms[roomid].usrids.splice(self.rooms[roomid].usrids.indexOf(usrid), 1)
 }
 
 const joinRoom = (roomid, usrid) => {
     const actualroom = getUsrRoom(usrid)
     if (actualroom) throw ("Sei già nella stanza " + actualroom)
-    if (rooms[roomid] == null) throw "Non esiste nessuna stanza con questo id"
-    const room = rooms[roomid]
-    rooms[roomid].usrids = [...room.usrids, usrid]
-    return rooms[roomid]
+    if (self.rooms[roomid] == null) throw "Non esiste nessuna stanza con questo id"
+    const room = self.rooms[roomid]
+    self.rooms[roomid].usrids = [...room.usrids, usrid]
+    return self.rooms[roomid]
 }
 
 const createRoom = (roomid, usrid) => {
     const actualroom = getUsrRoom(usrid)
     if (actualroom) throw ("Sei già nella stanza " + actualroom)
-    rooms[roomid] = {
+    self.rooms[roomid] = {
         roomid: roomid,
         usrids: [ usrid ],
-        headusr: usrid
+        headusr: usrid,
     }
     console.log('Created room ' + roomid)
-    return rooms[roomid]
+    return self.rooms[roomid]
 }
 
 app.get('/sendCommand', (req, res) => {
     let cmdRes = null
     const cmd = self.commands[req.query.cmd]
+    console.log(cmd)
     try {
         if (!cmd || !(cmd.execute)) throw "Command not found"
         if (cmd && cmd.execute) {
@@ -72,9 +72,9 @@ app.get('/sendCommand', (req, res) => {
 })
 
 app.get('/getroom', (req, res) => {
-    console.log(rooms)
+    console.log(self.rooms)
     res.status(200).json({
-        room: rooms[ getUsrRoom(req.query.usrid) ]
+        room: self.rooms[ getUsrRoom(req.query.usrid) ]
     })
 })
 
