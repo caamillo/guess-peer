@@ -57,8 +57,8 @@ app.get('/sendCommand', (req, res) => {
         if (!cmd || !(cmd.execute)) throw "Command not found"
         if (cmd && cmd.execute) {
             const args = Object.keys(req.query).filter(el => el != 'cmd').map(el => req.query[el])
-            if (args.length < cmd.minArgs) throw `Error: min. args: ${ cmd.minArgs }. You inserted: ${ args.length } args`
-            if (args.length > cmd.maxArgs && cmd.maxArgs !== -1) throw `Error: max. args: ${ cmd.maxArgs }. You inserted: ${ args.length } args`
+            if (args.length < cmd.args.min) throw `Error: min. args: ${ cmd.args.min }. You inserted: ${ args.length } args`
+            if (args.length > cmd.args.max && cmd.args.max !== -1) throw `Error: max. args: ${ cmd.args.max }. You inserted: ${ args.length } args`
             cmdRes = self.commands[req.query.cmd].execute(self, args)
         }
     } catch(err) {
