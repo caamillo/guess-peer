@@ -82,6 +82,11 @@ function App() {
             <button onClick={ () => createRoom() }>Create Room</button>
             <input id='roomidtxt' type='text'/>
             <button onClick={ () => joinRoom() }>Join Room</button>
+            <br></br>
+            <button onClick={ () => fetch('http://localhost:5001/sendCommand?' + new URLSearchParams({
+                cmd: 'start',
+                params: JSON.stringify([room.roomid])
+            })).then(res => res.json()).then(data => console.log(data)) }>Test Command</button>
         </div>
     );
 }

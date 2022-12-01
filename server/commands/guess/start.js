@@ -1,4 +1,4 @@
-const { initGame } = require('../../guess/utils')
+const { initGame, defaultCommand } = require('../../guess/utils')
 
 module.exports = {
     name: 'start',
@@ -6,21 +6,12 @@ module.exports = {
     args: {
         min: 1, max: -1
     },
-    utilisation: 'test [...args]',
-    execute: (self, roomid) => {
-        try {
-            if (!self.rooms[roomid]) throw "Questa stanza non esiste"
-            initGame(self, roomid)
-            console.log(self.rooms[roomid])
-        } catch(err) {
-            return {
-                code: 400,
-                message: err
-            }
-        }
-        return {
-            code: 200,
-            message: 'Testttstsstts'
-        }
-    }
+    utilisation: 'start [roomid]',
+    execute: (self, args) => defaultCommand([module.exports, args], () => {
+        const roomid = args[0]
+        if (!self.rooms[roomid]) throw "Questa stanza non esiste"
+        initGame(self, roomid)
+        self.rooms[roomid].game.started = true
+        return self.rooms[roomid].game
+    })
 }

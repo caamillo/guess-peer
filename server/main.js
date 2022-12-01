@@ -50,17 +50,13 @@ const createRoom = (roomid, usrid) => {
 }
 
 app.get('/sendCommand', (req, res) => {
-    let cmdRes = null
-    const cmd = self.commands[req.query.cmd]
-    console.log(cmd)
     try {
+        const cmd = self.commands[req.query.cmd]
         if (!cmd || !(cmd.execute)) throw "Command not found"
         if (cmd && cmd.execute) {
-            const args = Object.keys(req.query).filter(el => el != 'cmd').map(el => req.query[el])
-            if (args.length < cmd.args.min) throw `Error: min. args: ${ cmd.args.min }. You inserted: ${ args.length } args`
-            if (args.length > cmd.args.max && cmd.args.max !== -1) throw `Error: max. args: ${ cmd.args.max }. You inserted: ${ args.length } args`
-            cmdRes = self.commands[req.query.cmd].execute(self, args)
+            const cmdRes = self.commands[req.query.cmd].execute(self, JSON.parse(req.query.params))
             if (cmdRes.code >= 400) throw cmdRes.message
+            return res.status(200).json(cmdRes)
         }
     } catch(err) {
         return res.status(400).json({
@@ -68,7 +64,6 @@ app.get('/sendCommand', (req, res) => {
             message: err
         })
     }
-    return res.status(200).json(cmdRes)
 })
 
 app.get('/getroom', (req, res) => {
