@@ -1,0 +1,22 @@
+[
+    {
+        "id": 0,
+        "name": "Rammus 0",
+        "img": "https://www.powned.it/wp-content/uploads/2021/01/Rammus_0.jpg"
+    },
+    {
+        "id": 1,
+        "name": "Rammus 1",
+        "img": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Rammus_1.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Rammus 2",
+        "img": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Rammus_4.jpg"
+    },
+    {
+        "id": 3,
+        "name": "Rammus 3",
+        "img": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Rammus_3.jpg"
+    }
+]
