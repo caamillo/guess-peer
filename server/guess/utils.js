@@ -1,11 +1,16 @@
 const initGame = (self, roomid) => {
     self.rooms[roomid].game = {
-        started: false,
+        status: {
+            started: false,
+            usedids: [],
+            points: []
+        },
         config: self.config.guess,
-        round: 0,
-        points: []
+        round: {
+            nround: -1
+        }
     }
-    for (let usrid of self.rooms[roomid].usrids) self.rooms[roomid].game.points.push({
+    for (let usrid of self.rooms[roomid].usrids) self.rooms[roomid].game.status.points.push({
         usrid: usrid,
         points: 0
     })
@@ -34,6 +39,7 @@ const defaultCommand = ([cmd, args], callback) => {
             params: paramsPrinted
         }
     } catch(err) {
+        console.log(err)
         return {
             code: 400,
             message: err
